@@ -3,6 +3,7 @@ package br.com.dio.desafio;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Optional;
 
 public class Dev {
     private String nome;
@@ -46,9 +47,26 @@ public class Dev {
         return Objects.hash(nome, conteudosInscritos, conteudosConcluidos);
     };
 
-    public void inscreverBootcamp(Bootcamp bootcamp){}
+    public void inscreverBootcamp(Bootcamp bootcamp){
+        this.conteudosInscritos.addAll(bootcamp.getConteudos());
+        bootcamp.getDevsInscritos().add(this);
+    }
 
-    public void progredir(){}
+    public void progredir(){
+        Optional<Conteudo> conteudo = this.conteudosInscritos.stream().findFirst();
+        if(conteudo.isPresent()){
+            this.conteudosConcluidos.add(conteudo.get());
+            this.conteudosInscritos.remove(conteudo.get());
+        } 
+        else {
+            System.err.println("Você não está matriculado em nenhum conteudo");
+        }
+    }
 
-    public void calcularXp(){}
+    public Double calcularXp(){
+        return this.conteudosConcluidos
+                    .stream()
+                    .mapToDouble(Conteudo ::calcularXp)
+                    .sum();
+    }
 }
